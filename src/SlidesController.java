@@ -142,6 +142,7 @@ public class SlidesController {
         try{
             pageNumber = AnyConverter.toInt(xPropSet.getPropertyValue("Number"));
 
+            //debug
             System.out.println("currentPageNumber: " + pageNumber);
 
         } catch (WrappedTargetException e) {
@@ -161,6 +162,8 @@ public class SlidesController {
     private XDrawPage getDrawPageForNextSlide(XDrawPage currentPage) throws WrappedTargetException, IndexOutOfBoundsException {
         //gives out an element i.e : if 3 slides returns 3
         int totalNumberOfSlides = PageHelper.getDrawPageCount(currentPresentation) ;
+
+        //debug
         System.out.println(totalNumberOfSlides);
 
         //current page for slide

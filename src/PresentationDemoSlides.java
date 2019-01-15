@@ -34,16 +34,18 @@
  *************************************************************************/
 
 // __________ Imports __________
-
+//TODO my custom code example start here I've used PageHelper class and my CustomClass SlideController
 import com.sun.star.awt.Point;
 import com.sun.star.awt.Size;
 import com.sun.star.beans.PropertyValue;
 import com.sun.star.beans.XPropertySet;
 import com.sun.star.container.XNamed;
 import com.sun.star.drawing.*;
+import com.sun.star.frame.XDesktop;
 import com.sun.star.frame.XModel;
 import com.sun.star.lang.EventObject;
 import com.sun.star.lang.XComponent;
+import com.sun.star.lang.XMultiComponentFactory;
 import com.sun.star.lang.XServiceInfo;
 import com.sun.star.presentation.*;
 import com.sun.star.uno.UnoRuntime;
@@ -64,7 +66,8 @@ import java.util.Scanner;
 // The first parameter describes the connection that is to use. If there is no parameter
 // "uno:socket,host=localhost,port=2083;urp;StarOffice.ServiceManager" is used.
 
-
+//TODO need to figure out how to get active Presentation for control
+//TODO need to get the notes of each page as a String
 public class PresentationDemoSlides
 {
     public static void main( String args[] )
@@ -74,7 +77,7 @@ public class PresentationDemoSlides
         {
             // get the remote office context of a running office (a new office
             // instance is started if necessary)
-            com.sun.star.uno.XComponentContext xOfficeContext = Helper.connect();
+            com.sun.star.uno.XComponentContext xOfficeContext = Helper.connect();//TODO needed for desktop context
 
 
             // suppress Presentation Autopilot when opening the document
@@ -91,7 +94,16 @@ public class PresentationDemoSlides
                 "private:factory/simpress", "_blank", 0, pPropValues );
 
 
+            //TODO IMPORTANT get current component Impress (need a failsail for checking if we got )
+            /**
+            XMultiComponentFactory xRemoteServiceManager = xOfficeContext.getServiceManager();
+            Object desktop = xRemoteServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", xOfficeContext);
+            XDesktop xDesktop = (XDesktop)UnoRuntime.queryInterface(XDesktop.class,
+                    desktop);
 
+
+
+            xDrawDoc = xDesktop.getCurrentComponent();**/
 
 
             XDrawPage    xPage;
@@ -247,18 +259,7 @@ public class PresentationDemoSlides
 
 
 
-
-
-
-
-
-
     }
-
-
-
-
-
 
 
 

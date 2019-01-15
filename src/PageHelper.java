@@ -52,7 +52,7 @@ import com.sun.star.drawing.XMasterPagesSupplier;
 import com.sun.star.presentation.XPresentationPage;
 import com.sun.star.presentation.XHandoutMasterSupplier;
 
-
+//TODO important method to have
 public class PageHelper
 {
     // __________ static helper methods __________
