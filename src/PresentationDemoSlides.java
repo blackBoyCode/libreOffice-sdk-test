@@ -39,6 +39,7 @@ import com.sun.star.awt.Point;
 import com.sun.star.awt.Size;
 import com.sun.star.beans.PropertyValue;
 import com.sun.star.beans.XPropertySet;
+import com.sun.star.container.XEnumerationAccess;
 import com.sun.star.container.XNamed;
 import com.sun.star.drawing.*;
 import com.sun.star.frame.XDesktop;
@@ -48,11 +49,16 @@ import com.sun.star.lang.XComponent;
 import com.sun.star.lang.XMultiComponentFactory;
 import com.sun.star.lang.XServiceInfo;
 import com.sun.star.presentation.*;
+import com.sun.star.text.XText;
+import com.sun.star.text.XTextField;
+import com.sun.star.text.XTextFieldsSupplier;
 import com.sun.star.uno.UnoRuntime;
 
 import com.sun.star.frame.XController;
 import com.sun.star.view.XSelectionChangeListener;
 import com.sun.star.view.XSelectionSupplier;
+import org.w3c.dom.Text;
+
 
 import java.util.Scanner;
 
@@ -94,7 +100,7 @@ public class PresentationDemoSlides
                 "private:factory/simpress", "_blank", 0, pPropValues );
 
 
-            //TODO IMPORTANT get current component Impress (need a failsail for checking if we got )
+            //TODO IMPORTANT get current component Impress (need a failsail for checking if we got an impress document)
             /**
             XMultiComponentFactory xRemoteServiceManager = xOfficeContext.getServiceManager();
             Object desktop = xRemoteServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", xOfficeContext);
@@ -204,7 +210,29 @@ public class PresentationDemoSlides
 
 
 
+            //XDrawPage == one presentation slide
             XDrawPage xDrawPage = PageHelper.getDrawPageByIndex(xDrawDoc, 2) ;
+
+            //TODO method to get the notes from the XDrawPage Notes View from impress
+            //retrieve the separate XDrawPage notes witch is tied to the normal xDrawPage
+            XDrawPage xDrawPageNotes = PageHelper.getNotesPage(xDrawPage);
+
+            //get the collection of shapes embedded in the XDrawPage (XShapes here mean the elements inside the XDrawPage)
+            XShapes xShapes = (XShapes)UnoRuntime.queryInterface(XShapes.class, xDrawPageNotes);
+
+            //get the element from the Note "DrawPage"                     // get the Shape Object
+            XShape xShape = UnoRuntime.queryInterface(XShape.class, xShapes.getByIndex(1) );
+
+            //get the Xtext from the xShape
+            XText xText = (XText)UnoRuntime.queryInterface( XText.class, xShape);
+
+            //set the text for the xShape
+            xText.setString("example text");
+
+
+
+
+
 
 
            // XController xController = UnoRuntime.queryInterface(XController.class, xDrawPage);
@@ -231,6 +259,9 @@ public class PresentationDemoSlides
 
                 if(n == 10){
                     slidesController.nextSlide();
+
+
+                    System.out.print("slide 3 Notes: " + xText.getString());
 
                     //TODO when with start presentation in full screen
                     // xSlideShowController.gotoNextSlide();
