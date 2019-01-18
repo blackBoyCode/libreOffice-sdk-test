@@ -1,7 +1,6 @@
 import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.beans.XPropertySet;
-import com.sun.star.drawing.XDrawPage;
-import com.sun.star.drawing.XDrawView;
+import com.sun.star.drawing.*;
 import com.sun.star.frame.XController;
 import com.sun.star.frame.XModel;
 import com.sun.star.lang.IndexOutOfBoundsException;
@@ -11,8 +10,12 @@ import com.sun.star.presentation.XPresentation;
 import com.sun.star.presentation.XPresentation2;
 import com.sun.star.presentation.XPresentationSupplier;
 import com.sun.star.presentation.XSlideShowController;
+import com.sun.star.text.XText;
 import com.sun.star.uno.AnyConverter;
 import com.sun.star.uno.UnoRuntime;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * this class will control your impress slidesShow in editMode and PresentationMode
@@ -91,7 +94,7 @@ public class SlidesController {
             //TODO need to get current slide...
 
             //TODO then increment
-            XDrawPage temp = getDrawPageForNextSlide(xDrawView.getCurrentPage());//BUG
+            XDrawPage temp = getDrawPageForNextSlide(xDrawView.getCurrentPage());
             //TODO then setCurrentPage
 
             //use of xDrawViewer
@@ -158,7 +161,7 @@ public class SlidesController {
 
 
 
-    //TODO need a failsafe for NOT going indexOutOfBound from the presentation slides
+
     private XDrawPage getDrawPageForNextSlide(XDrawPage currentPage) throws WrappedTargetException, IndexOutOfBoundsException {
         //gives out an element i.e : if 3 slides returns 3
         int totalNumberOfSlides = PageHelper.getDrawPageCount(currentPresentation) ;
@@ -202,6 +205,72 @@ public class SlidesController {
         }
 
 
+    }
+
+    //TODO THE NEXT THREE METHODS NEED TO BE TESTED BEFORE USAGE "getSlidesNotes(),getSlidesPages(),getSlidesNotesPages()"
+
+    /**
+     * will return notes from each Slides
+     * @return a array of String
+     */
+    public String[] getSlidesNotesText() throws IndexOutOfBoundsException, WrappedTargetException{
+
+        List<XDrawPage> slidesNotesPages= getSlidesNotesPages();
+
+        String[] notesFromSlides = new String[getSlidesPages().getCount()];
+
+        for (int i = 0; i< slidesNotesPages.size(); i++){
+
+
+            //get the collection of shapes embedded in the XDrawPage (XShapes here mean the elements inside the XDrawPage)
+            XShapes xShapes = (XShapes)UnoRuntime.queryInterface(XShapes.class, slidesNotesPages.get(i));
+
+            //get the element from the Note "DrawPage"                     // get the Shape Object
+            XShape xShape = UnoRuntime.queryInterface(XShape.class, xShapes.getByIndex(1) );
+
+            //get the Xtext from the xShape
+            XText xText = (XText)UnoRuntime.queryInterface( XText.class, xShape);
+
+            notesFromSlides[i] = xText.getString();
+
+        }
+
+        return notesFromSlides;
+
+    }
+
+    /**
+     * get all the Slides from the impress document
+     * @return XDrawPages (presentation Slides)
+     */
+    public XDrawPages getSlidesPages(){
+
+        XDrawPagesSupplier xDrawPagesSupplier =
+                UnoRuntime.queryInterface(
+                        XDrawPagesSupplier.class, currentPresentation );
+        return xDrawPagesSupplier.getDrawPages();
+
+
+    }
+
+    /**
+     * get the slides Pages Notes View that correspond from original Slides
+     * @return a List of XDrawPage (note: do not confuse with XDrawPages Class)
+     */
+    private List<XDrawPage> getSlidesNotesPages() throws IndexOutOfBoundsException, WrappedTargetException {
+
+        System.out.println(getSlidesPages().getCount());//if this zero?//Need to Debug
+
+        List<XDrawPage> xDrawPageList = new ArrayList <>();
+
+        for (int i = 0; i < getSlidesPages().getCount(); i++){
+
+            xDrawPageList.add(PageHelper.getNotesPage(PageHelper.getDrawPageByIndex(currentPresentation,i)));
+
+        }
+
+
+        return  xDrawPageList;
     }
 
 
